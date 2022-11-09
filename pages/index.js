@@ -17,7 +17,7 @@ import {getSortedData} from "../utils/api/sort_data"
 
 export default function Home() {
   const [cards, setCards] = useState([])
-  const [filters, setFilters] = useState(["flamecharm"])
+  const [filters, setFilters] = useState([])
   getSortedData(setCards,filters)
 
   return (

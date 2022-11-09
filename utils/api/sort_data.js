@@ -7,17 +7,18 @@ const getSortedData = (setCards,filters) => {
     let cards = []
     data.cards.map((card) => {
       if (hasWord(card.desc,"talent")){
-        if (filters != null){
-          let filterid = data.labels.map((label) => {
-            return filters.map((filter) => {
-              console.log(filter)
+        if (filters != null && filters.length > 0){
+          let filterid = ""
+          data.labels.map((label) => {
+            filters.map((filter) => {
               if (hasWord(label.name,filter)) {
-                console.log("WORK NOW PLZ")
-                return label.id
+                filterid = label.id
               }
             })
           })
+          console.log(filterid)
           card.idLabels.map((label) => {
+            console.log(label)
             if (filterid == label) {
               cards.push(card)
               return
