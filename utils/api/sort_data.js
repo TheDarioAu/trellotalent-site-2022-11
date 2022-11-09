@@ -4,14 +4,15 @@ const getSortedData = (setCards,filters) => {
   const hasWord = (str, word) => 
     str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/).includes(word);
   getTrelloData().then(function(data){
-    console.log(data)
     let cards = []
     data.cards.map((card) => {
       if (hasWord(card.desc,"talent")){
         if (filters != null){
           let filterid = data.labels.map((label) => {
             return filters.map((filter) => {
-              if (label.name == filter) {
+              console.log(filter)
+              if (hasWord(label.name,filter)) {
+                console.log("WORK NOW PLZ")
                 return label.id
               }
             })
