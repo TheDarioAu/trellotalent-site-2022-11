@@ -18,8 +18,16 @@ import {getSortedData} from "../utils/api/sort_data"
 export default function Home() {
   const [cards, setCards] = useState([])
   const [filters, setFilters] = useState([])
+  
+
+  const filteredCards = () => {
+    setFilters(["flamecharm"])
+    getSortedData(setCards,filters)
+  }
   getSortedData(setCards,filters)
 
+
+  
   return (
     <div>
       <Head>
@@ -40,6 +48,12 @@ export default function Home() {
       </AppBar>
       <main>
         <Container maxWidth="sm">
+          <Button
+            variant="contained"
+            onClick={filteredCards}
+            >
+            Gets the good
+          </Button>
           <Box
               sx={{
                 bgcolor: 'background.paper',
@@ -52,6 +66,7 @@ export default function Home() {
                 {card.name}
               </Button>
             })}
+
           </Box>
         </Container>
       </main>
