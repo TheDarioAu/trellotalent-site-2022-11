@@ -1,50 +1,61 @@
-import {getTrelloData} from './trello_data.js'
+import { getTrelloData } from './trello_data.js'
+import { hasWord} from './has_word.js';
+import { getFilteredCards } from "./filter_cards"
 
-const getSortedData = (setCards,filters) => {
-  const blacklist = ["format", "changelog"]
-  const hasWord = (str, word) => 
-    str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/).includes(word);
+const getSortedData = (setData,renderCards) => {
+  const blacklist = ["format", "changelog","removed"]
   const notBlacklisted = (str) => {
-    let notBlacklist = true
-    blacklist.map((blacklist_word) => {
-      if (hasWord(str,blacklist_word)) {
-        notBlacklist = false
-      }
-    })
-    return notBlacklist
+      let notBlacklist = true
+      blacklist.map((blacklist_word) => {
+          if (hasWord(str,blacklist_word)) {
+              notBlacklist = false
+          }
+      })
+      return notBlacklist
   }
-    
-
-
+  const cleanName = (str) => {
+    return str.substring(0,str.indexOf("|"))
+  }
+  const cleanDesc = (str) => {
+    let start = str.indexOf("Description") 
+    let end = str.indexOf("What It Does In-Game:")
+    if (end <= start) {
+      end = str.length
+    }
+    let offset = 4
+    let str2 = str.substring(start, end)
+    start = str2.indexOf("---")
+    let str3 = str2.substring(start, end)
+    start = str3.indexOf("---")
+    return str3.substring(start + offset, end)
+  }
+  let sortedData = {}
+  sortedData.cards = []
+  sortedData.labels = []
   getTrelloData().then(function(data){
-    let cards = []
     data.cards.map((card) => {
-      if (hasWord(card.desc,"talent") && notBlacklisted(card.name) ){
-        if (filters != null && filters.length > 0){
-          let filterid = ""
-          data.labels.map((label) => {
-            filters.map((filter) => {
-              if (hasWord(label.name,filter)) {
-                filterid = label.id
-              }
-            })
-          })
-          console.log(filterid)
-          card.idLabels.map((label) => {
-            console.log(label)
-            if (filterid == label) {
-              cards.push(card)
-              return
-            }
-          })
-        } else {
-          cards.push(card)
+      if (hasWord(card.desc,"talent") && notBlacklisted(card.name)) {
+        card.Selected = false
+        card.name = cleanName(card.name)
+        card.desc = cleanDesc(card.desc)
+        if (card.name.length > 0) {
+          sortedData.cards.push(card)
         }
       }
     })
-    setCards(cards)
+    data.labels.map((label) => {
+      sortedData.labels.push(label)
+    })
+    if (sortedData.cards.length > 0 && sortedData.labels.length > 0 ) {
+      if (setData) {
+        sortedData.Loaded = true
+        setData(sortedData)
+        renderCards(sortedData)
+      }
+      return
+    }
   })
+  return sortedData
 }
 
 export { getSortedData }
-//<img src=${astronautData.profile_image_thumbnail} class="rounded float-start" alt=""">    
