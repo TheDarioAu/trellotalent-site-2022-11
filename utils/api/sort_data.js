@@ -43,8 +43,11 @@ const getSortedData = (setData,renderCards) => {
         }
       }
     })
-    data.labels.map((label) => {
+    data.labels.map((label) => { //sort a-z
       sortedData.labels.push(label)
+    })
+    data.cards.sort(function (a, b) {
+      return a.length - b.length;
     })
     if (sortedData.cards.length > 0 && sortedData.labels.length > 0 ) {
       if (setData) {
