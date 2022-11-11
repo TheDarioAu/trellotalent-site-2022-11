@@ -130,6 +130,20 @@ const getSortedData = (setData,renderCards) => {
         if (card.name.length > 0) {
           sortedData.cards.push(card)
         }
+        data.labels.map((label) => { //add labels to the stats it changes
+          if (card.stats[label.name]) {
+            let foundLabel = false
+            for (let index = 0; index < card.idLabels.length; index++) {
+              if (label.id == card.idLabels[index]) {
+                foundLabel = true
+                break
+              }
+            }
+            if (!foundLabel) {
+              card.idLabels.push(label.id)
+            }
+          }
+        })
       }
     })
     weaponCards.map((weaponName) => {
