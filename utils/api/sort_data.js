@@ -80,6 +80,9 @@ const getSortedData = (setData,renderCards) => {
     let start = str.indexOf("Description") 
     let end = str.indexOf("What It Does In-Game:")
     if (end <= start) {
+      end = str.indexOf("Talent Stats:")
+    }
+    if (end <= start) {
       end = str.length
     }
     let offset = 4
