@@ -1,8 +1,6 @@
 import { getTrelloData } from './trello_data.js'
 import { hasWord } from './has_word.js';
-import { getFilteredCards } from "./filter_cards"
 import * as Icons from '@mui/icons-material';
-import { Icon } from '@mui/material';
 
 const getSortedData = (setData,renderCards) => {
   let sortedData = {}
