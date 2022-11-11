@@ -78,18 +78,14 @@ const getSortedData = (setData,renderCards) => {
     return str.substring(0,str.indexOf("|")).trim()
   }
   const cleanDesc = (str) => {
-    let start = str.indexOf("Description") 
+    let start = str.indexOf("Description:") 
     let end = str.indexOf("What It Does In-Game:")
     if (end <= start) {
       end = str.length
     }
     let str2 = str.substring(start, end)
-    let offset = 4
-    for (let i = 1; i < 3; i++) {
-        str2 = str.substring(start, end)
-        start = str2.indexOf("---")
-    }
-    return str2.substring(start + offset, end)
+    let start2 = str.indexOf("---") 
+    return str2.substring(start2, end)
   }
   sortedData.cards = []
   sortedData.labels = []
