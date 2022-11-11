@@ -78,6 +78,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function Home() {
   let debounce = false
+  let multiStatCards = {Neuroplasticity: true,}
   const [filters, setFilters] = React.useState([])
   const [filteredCards, setFilteredCards] = React.useState([])
   const [data, setData] = React.useState(getSortedData())
@@ -154,18 +155,93 @@ export default function Home() {
   }
   const calculateStats = (selectedCards) => {
     let newStats = getEmptyStats()
+    //First do the normal card stuff, ignore neuro i guess
     data.cards.map((card) => {
       if (card.Selected) {
-        const addStat = (statName) => {
-          if (card.stats[statName] && newStats[statName] < card.stats[statName]) {
-            newStats[statName] = card.stats[statName]
+        if (!multiStatCards[card.name]) {
+          const addStat = (statName) => {
+            if (card.stats[statName] && newStats[statName] < card.stats[statName]) {
+              newStats[statName] = card.stats[statName]
+            }
           }
+          attribute_names.map(addStat)
+          element_names.map(addStat)
+          weapon_names.map(addStat)
         }
-        attribute_names.map(addStat)
-        element_names.map(addStat)
-        weapon_names.map(addStat)
       }
     })
+    data.cards.map((card) => {
+      if (card.Selected) {
+        if (multiStatCards[card.name]) {
+          let usingStats = []
+          let cardStats = {...card.stats}
+          let foundStat = null
+          const findExisitngStat = (statName) => {
+            if (cardStats[statName] && !foundStat && newStats[statName] >= cardStats[statName]) {
+              foundStat = foundStat
+            }
+            if (cardStats[statName]) {
+              usingStats.push(statName)
+            }
+          }
+          let largestStatNum = 0
+          let largestStatName = null
+          const adjustStat = (statName) => {
+            if (cardStats[statName]) {
+              if (foundStat) {
+                if (foundStat != statName) {
+                  cardStats[statName] = 0
+                } 
+              } else {
+                if (cardStats[statName] > 0 && newStats[statName] > largestStatNum) {
+                  largestStatNum = newStats[statName]
+                  largestStatName = statName
+                }
+              }
+            }
+          }
+          let randomChoice = Math.floor(Math.random() * usingStats.length)
+          const clearUnusedStat = (statName) => {
+            if (largestStatName) {
+              if (largestStatName != statName) {
+                cardStats[statName] = 0
+              }
+            } else {
+              if (statName != usingStats[randomChoice]) {
+                cardStats[statName] = 0
+              }
+            }
+          }
+          const addStat = (statName) => {
+            if (cardStats[statName] && newStats[statName] < cardStats[statName]) {
+              newStats[statName] = cardStats[statName]
+            }
+          }
+          //Find Stat
+          attribute_names.map(findExisitngStat)
+          element_names.map(findExisitngStat)
+          weapon_names.map(findExisitngStat)
+          //Adjust Stats
+          attribute_names.map(adjustStat)
+          element_names.map(adjustStat)
+          weapon_names.map(adjustStat)
+          //Clean Stats
+          attribute_names.map(clearUnusedStat)
+          element_names.map(clearUnusedStat)
+          weapon_names.map(clearUnusedStat)
+          //Add Stat
+          attribute_names.map(addStat)
+          element_names.map(addStat)
+          weapon_names.map(addStat)
+        }
+      }
+    })
+    
+
+
+
+
+
     const calculateRemainder = (statName) => {
       newStats.RemainingPoints -= newStats[statName]
     }
