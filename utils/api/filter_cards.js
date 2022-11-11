@@ -5,8 +5,7 @@ const getFilteredCards = (data, filters, search) => {
   const addFilteredCard = (card) => {
     if (hasWord(card.name,search)) {
       filteredCards.push(card) 
-    }
-    if (hasWord(card.desc,search)) {
+    } else if (hasWord(card.desc,search)) {
       filteredCards.push(card) 
     }
   }
