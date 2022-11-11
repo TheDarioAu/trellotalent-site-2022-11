@@ -126,6 +126,16 @@ export default function Home() {
     newfilteredCards[index].Selected = !newfilteredCards[index].Selected 
     setFilteredCards(newfilteredCards)
     calculateStats(newfilteredCards)
+    let newDataCards = [...data.cards]
+    newDataCards.map((card2) => {
+      if (card2.name == card.name) {
+        card2.Selected = newfilteredCards[index].Selected
+        return
+      }
+    })
+    let newData = data
+    newData.cards = newDataCards
+    setData(newData)
   }
   const getCardColor = (card) => {
     if (card.Selected) {
@@ -144,7 +154,7 @@ export default function Home() {
   }
   const calculateStats = (selectedCards) => {
     let newStats = getEmptyStats()
-    selectedCards.map((card) => {
+    data.cards.map((card) => {
       if (card.Selected) {
         const addStat = (statName) => {
           if (card.stats[statName] && newStats[statName] < card.stats[statName]) {
