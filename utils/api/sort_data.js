@@ -1,9 +1,38 @@
 import { getTrelloData } from './trello_data.js'
-import { hasWord} from './has_word.js';
+import { hasWord } from './has_word.js';
 import { getFilteredCards } from "./filter_cards"
+import * as Icons from '@mui/icons-material';
+import { Icon } from '@mui/material';
 
 const getSortedData = (setData,renderCards) => {
+  let sortedData = {}
   const blacklist = ["format", "changelog","removed"]
+  const validlists = ["common", "rare", "legendary"]
+  const elementlist = {
+    Flamecharm: Icons.LocalFireDepartment,
+    Frostdraw: Icons.AcUnit,
+    Galebreath: Icons.Air,
+    Thundercall: Icons.ElectricBolt,
+    Shadowcast: Icons.Nightlight,
+  }
+  const attributelist = {
+    Strength: Icons.FitnessCenter,
+    Agility: Icons.DirectionsRun,
+    Intelligence: Icons.EmojiObjects,
+    Fortitude: Icons.HealthAndSafety,
+    Charisma: Icons.AddReaction,
+    Willpower: Icons.Psychology,
+  }
+  const raritylist = {
+    Common: Icons.StarOutlineOutlined,
+    Rare: Icons.StarRate,
+    Legendary: Icons.AutoAwesome,
+  }
+  const weaponlist = {
+    ["Light Weapon"]: Icons.BarChart,
+    ["Medium Weapon"]: Icons.BarChart,
+    ["Heavy Weapon"]: Icons.BarChart,
+  }
   const notBlacklisted = (str) => {
       let notBlacklist = true
       blacklist.map((blacklist_word) => {
@@ -13,8 +42,41 @@ const getSortedData = (setData,renderCards) => {
       })
       return notBlacklist
   }
+  const getStats = (str) => {
+    let str_array = str.substring(str.indexOf("Requirements"),str.length).toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
+    let stats_array = []
+    let stats = {}
+    sortedData.attributes.map((attribute) => {
+      stats_array.push(attribute.name)
+    })
+    sortedData.elements.map((element) => {
+      stats_array.push(element.name)
+    })
+    sortedData.weapons.map((weapons) => {
+      stats_array.push(weapons.name)
+    })
+    for (let index = 0; index < stats_array.length; index++) {
+      stats_array.map((statName) => {
+        let statText = statName.toLowerCase().trim()
+        let endPoint = statText.indexOf(" ")
+        if (endPoint <= 0) {
+          endPoint = statText.length
+        }
+        let compareText = statText.substring(0,endPoint)
+        if (str_array[index] == compareText) {
+          let num = parseInt(str_array[index - 1])
+          if (!num) {
+            num = parseInt(str_array[index + 1])
+          }
+          stats[statName] = num
+        }
+      })
+    }
+    
+    return stats
+  }
   const cleanName = (str) => {
-    return str.substring(0,str.indexOf("|"))
+    return str.substring(0,str.indexOf("|")).trim()
   }
   const cleanDesc = (str) => {
     let start = str.indexOf("Description") 
@@ -29,13 +91,40 @@ const getSortedData = (setData,renderCards) => {
     start = str3.indexOf("---")
     return str3.substring(start + offset, end)
   }
-  let sortedData = {}
   sortedData.cards = []
   sortedData.labels = []
+  sortedData.cardlists = []
+  sortedData.elements = []
+  sortedData.weapons = []
+  sortedData.rarity = []
+  sortedData.misc = []
+  sortedData.attributes = []
+  sortedData.stats = []
   getTrelloData().then(function(data){
+    data.labels.map((label) => { //sort a-z
+      if (elementlist[label.name]) { // its a element
+        label.icon = elementlist[label.name]
+        sortedData.elements.push(label)
+      } else if (attributelist[label.name]) { // its an attribute
+        label.icon = attributelist[label.name]
+        sortedData.attributes.push(label)
+      } else if (raritylist[label.name]) { // its rarity
+        label.icon = raritylist[label.name]
+        sortedData.rarity.push(label)  
+      } else if (weaponlist[label.name]) { // its weapon
+        label.icon = weaponlist[label.name]
+        sortedData.weapons.push(label) 
+      } else if (label.name.substring(0,1) == "+") { //its a stat
+        sortedData.stats.push(label)
+      } else { //its something else
+        sortedData.misc.push(label)
+      }
+      sortedData.labels.push(label)
+    })
     data.cards.map((card) => {
       if (hasWord(card.desc,"talent") && notBlacklisted(card.name)) {
         card.Selected = false
+        card.stats = getStats(card.desc)
         card.name = cleanName(card.name)
         card.desc = cleanDesc(card.desc)
         if (card.name.length > 0) {
@@ -43,11 +132,24 @@ const getSortedData = (setData,renderCards) => {
         }
       }
     })
-    data.labels.map((label) => { //sort a-z
-      sortedData.labels.push(label)
-    })
-    data.cards.sort(function (a, b) {
-      return a.length - b.length;
+    const sort = (a, b) => {
+      if (a.name < b.name) {
+        return -1
+      }
+      if (a.name > b.name) {
+        return 1
+      }
+      return 0
+    }
+    sortedData.cards.sort(sort)
+    sortedData.labels.sort(sort)
+    sortedData.cardlists = []
+    data.lists.map((list) => {
+      validlists.map((listname) => {
+        if (hasWord(list.name,listname)) {
+          sortedData.cardlists.push(list)
+        }
+      })
     })
     if (sortedData.cards.length > 0 && sortedData.labels.length > 0 ) {
       if (setData) {
