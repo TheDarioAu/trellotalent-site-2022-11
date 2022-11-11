@@ -6,6 +6,7 @@ const getSortedData = (setData,renderCards) => {
   let sortedData = {}
   const blacklist = ["format", "changelog","removed"]
   const validlists = ["common", "rare", "legendary"]
+  const weaponCards = ["Light", "Medium", "Heavy"]
   const elementlist = {
     Flamecharm: Icons.LocalFireDepartment,
     Frostdraw: Icons.AcUnit,
@@ -54,6 +55,9 @@ const getSortedData = (setData,renderCards) => {
       stats_array.push(weapons.name)
     })
     for (let index = 0; index < stats_array.length; index++) {
+      if (str_array[index] == "talent") {
+        break
+      }
       stats_array.map((statName) => {
         let statText = statName.toLowerCase().trim()
         let endPoint = statText.indexOf(" ")
@@ -126,6 +130,23 @@ const getSortedData = (setData,renderCards) => {
         if (card.name.length > 0) {
           sortedData.cards.push(card)
         }
+      }
+    })
+    weaponCards.map((weaponName) => {
+      for (let stat = 20; stat <= 100; stat += 20) {
+        let card = {}
+        card.Selected = false
+        card.stats = {[`${weaponName} Weapon`]: stat}
+        card.name = `${stat.toString()} ${weaponName} Weapon`
+        card.desc = `Adds ${stat.toString()} to ${weaponName} Weapon, use this to account for your weapon.`
+        card.idLabels = []
+        data.labels.map((label) => {
+          if (label.name == `${weaponName} Weapon`) {
+            card.idLabels.push(label.id)
+          }
+        })
+        data.cards.push(card)
+        sortedData.cards.push(card)
       }
     })
     const sort = (a, b) => {
