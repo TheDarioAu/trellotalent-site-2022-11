@@ -55,6 +55,12 @@ const getFilteredCards = (data, filters, search) => {
       data.cards.map((card) => {
         addFilteredCard(card)
       })
+    } else {
+      data.cards.map((card) => {
+        if (card.Selected) {
+          addFilteredCard(card)
+        }
+      })
     }
   }
   return filteredCards

@@ -236,12 +236,6 @@ export default function Home() {
         }
       }
     })
-    
-
-
-
-
-
     const calculateRemainder = (statName) => {
       newStats.RemainingPoints -= newStats[statName]
     }
@@ -267,6 +261,21 @@ export default function Home() {
       renderCards(data,newfilters)
       setFilters(newfilters)
     }
+  }
+  const clearSelectedCards = (e) => {
+    let newfilteredCards = [...filteredCards]
+    newfilteredCards.map((card) => {
+      card.Selected = false
+    })
+    setFilteredCards(newfilteredCards)
+    calculateStats(newfilteredCards)
+    let newDataCards = [...data.cards]
+    newDataCards.map((card) => {
+      card.Selected = false
+    })
+    let newData = data
+    newData.cards = newDataCards
+    setData(newData)
   }
   const loadingMessage = () => {
     if (data.Loaded == null) {
@@ -493,6 +502,13 @@ export default function Home() {
                   </ListItem>
                 ))}
               </List>
+              <Divider />
+              <ListItemButton onClick={(e) => clearSelectedCards(e)}  style={{backgroundColor: 'LightCoral'}}>
+                <ListItemIcon>
+                  <Icons.Clear/>
+                </ListItemIcon>
+                <ListItemText primary={"Clear Selected"} />
+              </ListItemButton>
             </>
           }
         </Drawer>
