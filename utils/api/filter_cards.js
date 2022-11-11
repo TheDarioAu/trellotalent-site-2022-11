@@ -6,6 +6,9 @@ const getFilteredCards = (data, filters, search) => {
     if (hasWord(card.name,search)) {
       filteredCards.push(card) 
     }
+    if (hasWord(card.desc,search)) {
+      filteredCards.push(card) 
+    }
   }
   if (filters != null && filters.length > 0){
     let matchingFilters = []

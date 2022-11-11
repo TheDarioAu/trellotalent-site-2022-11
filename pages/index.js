@@ -270,7 +270,7 @@ export default function Home() {
                 id="search"
                 name="search"
                 color="success"
-                label="Search Talent"
+                label="Search Talents"
                 variant="standard"
                 size='small'
                 sx={{ml:"5%", width:'90%'}}
