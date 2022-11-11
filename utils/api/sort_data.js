@@ -66,11 +66,12 @@ const getSortedData = (setData,renderCards) => {
           if (!num) {
             num = parseInt(str_array[index + 1])
           }
-          stats[statName] = num
+          if (stats[statName] == null) {
+              stats[statName] = num
+          }
         }
       })
     }
-    
     return stats
   }
   const cleanName = (str) => {
@@ -80,17 +81,15 @@ const getSortedData = (setData,renderCards) => {
     let start = str.indexOf("Description") 
     let end = str.indexOf("What It Does In-Game:")
     if (end <= start) {
-      end = str.indexOf("Talent Stats:")
-    }
-    if (end <= start) {
       end = str.length
     }
-    let offset = 4
     let str2 = str.substring(start, end)
-    start = str2.indexOf("---")
-    let str3 = str2.substring(start, end)
-    start = str3.indexOf("---")
-    return str3.substring(start + offset, end)
+    let offset = 4
+    for (let i = 1; i < 3; i++) {
+        str2 = str.substring(start, end)
+        start = str2.indexOf("---")
+    }
+    return str2.substring(start + offset, end)
   }
   sortedData.cards = []
   sortedData.labels = []
