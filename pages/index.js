@@ -107,7 +107,7 @@ export default function Home() {
     data.weapons.map((weapons) => {
       newStats[weapons.name] = 0
     })
-    newStats.RemainingPoints = 323
+    newStats.RemainingPoints = 310
     return newStats
   }
   const renderCards = (data,newfilters,newSearch) => {
@@ -415,9 +415,9 @@ export default function Home() {
                   <Typography key={"Hint"} sx={{fontWeight: 500, fontStyle: 'oblique'}} variant="caption">
                     {"Note:"}
                     <br/>
-                    {"-Consider points for weapon"}
+                    {"-Remember total points can be 327"}
                     <br/>
-                    {"-Consider points from race"}
+                    {"-Consider weapon, race, and starting points"}
                     <br/>
                     {"-Information may be outdated"}
                   </Typography>
