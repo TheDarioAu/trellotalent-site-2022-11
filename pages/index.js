@@ -277,6 +277,18 @@ export default function Home() {
     newData.cards = newDataCards
     setData(newData)
   }
+  const getCardStats = (card) => {
+    let statsString = ""
+    const addStat = (statName) => {
+      if (card.stats[statName]) {
+        statsString = `${statsString} ${statName}: ${card.stats[statName]}\n`
+      }
+    }
+    attribute_names.map(addStat)
+    element_names.map(addStat)
+    weapon_names.map(addStat)
+    return statsString
+  }
   const loadingMessage = () => {
     if (data.Loaded == null) {
       return "Retrieving Data from Deepwoken Talent List..."
@@ -552,6 +564,9 @@ export default function Home() {
                           <Typography sx={{ fontSize: 15, textTransform: 'none'}} color="text.secondary" gutterBottom>
                             <br/>
                             {card.desc}
+                            <br/>
+                            <br/>
+                            {getCardStats(card)}
                           </Typography>
                         }
                       </CardContent>
