@@ -281,13 +281,13 @@ export default function Home() {
     let statsString = ""
     const addStat = (statName) => {
       if (card.stats[statName]) {
-        statsString = `${statsString} ${statName}: ${card.stats[statName]}\n`
+        statsString = `${statsString} |\n ${statName}: ${card.stats[statName]}`
       }
     }
     attribute_names.map(addStat)
     element_names.map(addStat)
     weapon_names.map(addStat)
-    return statsString
+    return statsString + " |"
   }
   const loadingMessage = () => {
     if (data.Loaded == null) {
