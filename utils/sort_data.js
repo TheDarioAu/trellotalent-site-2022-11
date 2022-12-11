@@ -151,7 +151,7 @@ const getSortedData = (setData,renderCards) => {
       let card = {}
       card.stats = {[stat]: 0}
       card.name = `# to ${stat}`
-      card.desc = `Adds an amount to ${stat}`
+      card.desc = `Adds an amount to ${stat}.`
       card.Selected = false
       card.CanInput = true
       card.idLabels = []
