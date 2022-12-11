@@ -95,7 +95,12 @@ const getSortedData = (setData,renderCards) => {
     }
     let str2 = str.substring(start, end)
     let start2 = str.indexOf("---") - "Description".length - 1
-    return str2.substring(start2, end)
+    let str3 = str2.substring(start2, end)
+    let start3 = str3.indexOf("## ")
+    if (start3 == -1) {
+      return str3
+    }
+    return str3.substring(start3 + 3, end)
   }
   sortedData.cards = []
   sortedData.labels = []
