@@ -120,7 +120,7 @@ export default function Home() {
     data.weapons.map((weapons) => {
       newStats[weapons.name] = 0
     })
-    newStats.RemainingPoints = 310
+    newStats.RemainingPoints = 327
     return newStats
   }
   const renderCards = (data,newfilters,newSearch) => {
@@ -506,11 +506,11 @@ export default function Home() {
                   <Typography key={"Hint"} sx={{fontWeight: 500, fontStyle: 'oblique'}} variant="caption">
                     {"Note:"}
                     <br/>
-                    {"-Remember total points can be 327"}
+                    {"-Consider race and starting points"}
                     <br/>
-                    {"-Consider weapon, race, and starting points"}
+                    {"-Remember to account for your weapon"}
                     <br/>
-                    {"-Information may be outdated"}
+                    {"-Information may be outdated or incorrect, blame the trello"}
                   </Typography>
                 </List>
               </Container>
