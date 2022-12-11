@@ -1,4 +1,4 @@
-import { getTrelloData } from './trello_data.js'
+import { getTrelloData } from './api/trello_data.js'
 import { hasWord } from './has_word.js';
 import * as Icons from '@mui/icons-material';
 
@@ -124,6 +124,7 @@ const getSortedData = (setData,renderCards) => {
     data.cards.map((card) => {
       if (hasWord(card.desc,"talent") && notBlacklisted(card.name)) {
         card.Selected = false
+        card.CanInput = false
         card.stats = getStats(card.desc)
         card.name = cleanName(card.name)
         card.desc = cleanDesc(card.desc)
@@ -146,23 +147,27 @@ const getSortedData = (setData,renderCards) => {
         })
       }
     })
+    const addInputCard = (stat) => {
+      let card = {}
+      card.stats = {[stat]: 0}
+      card.name = `# to ${stat}`
+      card.desc = `Adds an amount to ${stat}`
+      card.Selected = false
+      card.CanInput = true
+      card.idLabels = []
+      data.labels.map((label) => {
+        if (label.name == stat) {
+          card.idLabels.push(label.id)
+        }
+      })
+      data.cards.push(card)
+      sortedData.cards.push(card)
+    }
     weaponCards.map((weaponName) => {
-      for (let stat = 20; stat <= 100; stat += 20) {
-        let card = {}
-        card.Selected = false
-        card.stats = {[`${weaponName} Weapon`]: stat}
-        card.name = `${stat.toString()} ${weaponName} Weapon`
-        card.desc = `Adds ${stat.toString()} to ${weaponName} Weapon, use this to account for your weapon.`
-        card.idLabels = []
-        data.labels.map((label) => {
-          if (label.name == `${weaponName} Weapon`) {
-            card.idLabels.push(label.id)
-          }
-        })
-        data.cards.push(card)
-        sortedData.cards.push(card)
-      }
+      addInputCard(`${weaponName} Weapon`)
     })
+    Object.keys(elementlist).forEach(addInputCard)
+    Object.keys(attributelist).forEach(addInputCard)
     const sort = (a, b) => {
       if (a.name < b.name) {
         return -1

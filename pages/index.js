@@ -26,9 +26,15 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import * as Icons from '@mui/icons-material';
-import {getSortedData} from "../utils/api/sort_data"
-import {getFilteredCards} from "../utils/api/filter_cards"
+import {getSortedData} from "../utils/sort_data"
+import {getFilteredCards} from "../utils/filter_cards"
+//#region drawer functions
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -75,6 +81,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
+//#endregion
+
+const isNumeric = (val) => {
+  return /^-?\d+$/.test(val);
+}
 
 export default function Home() {
   let debounce = false
@@ -96,6 +107,8 @@ export default function Home() {
   data.weapons.map((weapons) => {
     weapon_names.push(weapons.name)
   })
+
+  //#region functions
   const getEmptyStats = () => {
     let newStats = {}
     data.attributes.map((attribute) => {
@@ -123,6 +136,13 @@ export default function Home() {
     setFilteredCards(filteredCards)
   }
   const clickedOnCard = (e,card,index) => {
+    if (!card.Selected && card.CanInput) {
+      let statName = ""
+      Object.keys(card.stats).forEach(function(stat) {
+        statName = stat
+      })
+      handleClickOpen(statName,card.name) 
+    }
     let newfilteredCards = [...filteredCards]
     newfilteredCards[index].Selected = !newfilteredCards[index].Selected 
     setFilteredCards(newfilteredCards)
@@ -137,6 +157,22 @@ export default function Home() {
     let newData = data
     newData.cards = newDataCards
     setData(newData)
+  }
+  const setCardData = (cardName, statInput) => {
+    let newfilteredCards = [...filteredCards]
+    newfilteredCards.map((card) => {
+      if (card.name == cardName) {
+        if (statInput < 0) {
+          statInput = 0
+        }
+        Object.keys(card.stats).forEach(function(stat) {
+          card.stats[stat] = statInput
+        })
+        return
+      }
+    })
+    setFilteredCards(newfilteredCards)
+    calculateStats(newfilteredCards)
   }
   const getCardColor = (card) => {
     if (card.Selected) {
@@ -287,7 +323,10 @@ export default function Home() {
     attribute_names.map(addStat)
     element_names.map(addStat)
     weapon_names.map(addStat)
-    return statsString + " |"
+    if (statsString.length > 0) {
+      statsString = statsString + " |"
+    }
+    return statsString
   }
   const loadingMessage = () => {
     if (data.Loaded == null) {
@@ -296,10 +335,16 @@ export default function Home() {
       return
     }
   }
-  React.useEffect(()=> {
-    getSortedData(setData,renderCards)
-    setStats(getEmptyStats())
-  }, [])
+  const filterSearchCards = (newSearch,event) => {
+    let searchText = newSearch
+    if (!event.nativeEvent.data) {
+      searchText = ""
+    }
+    setSearch(searchText)
+    renderCards(data,filters,searchText)
+    return
+  }
+  //#endregion
 
   //#region drawer
   const theme = useTheme();
@@ -320,19 +365,53 @@ export default function Home() {
   };
   //#endregion
 
-  function filterSearchCards(newSearch,event){
-    let searchText = newSearch
-    if (!event.nativeEvent.data) {
-      searchText = ""
-    }
-    setSearch(searchText)
-    renderCards(data,filters,searchText)
-    return
+  //#region prompt
+  const [openPrompt, setOpenPrompt] = React.useState(false)
+  const [promptText, setPromptText] = React.useState("")
+  const [promptInput, setPromptInput] = React.useState(0)
+  const [promptCard, setPromptCard] = React.useState("")
+  const handleClickOpen = (statName, cardName) => {
+    setPromptText(statName)
+    setPromptCard(cardName)
+    setOpenPrompt(true)
   }
+  const handleClose = () => {
+    setOpenPrompt(false)
+    setCardData(promptCard, promptInput)
+  }
+  const handleInput = (inputValue) => {
+    setPromptInput(inputValue)
+  }
+  //#endregion
+
+  React.useEffect(()=> {
+    getSortedData(setData,renderCards)
+    setStats(getEmptyStats())
+  }, [])
 
   return (
     <div>
-      {/* Box is drawer */}
+      <Dialog open={openPrompt} onClose={setOpenPrompt}>
+        <DialogTitle>{promptText}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter an amount for {promptText}
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="stat"
+            type="number"
+            fullWidth
+            variant="standard"
+            value = {promptInput}
+            onChange={(e)=>{handleInput(e.target.value,e)}}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline/>
         <AppBar position="fixed" open={open} color="success">
