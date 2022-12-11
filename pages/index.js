@@ -108,7 +108,6 @@ export default function Home() {
   data.weapons.map((weapons) => {
     weapon_names.push(weapons.name)
   })
-
   //#region functions
   const getEmptyStats = () => {
     let newStats = {}
@@ -404,7 +403,13 @@ export default function Home() {
   React.useEffect(()=> {
     getSortedData(setData,renderCards)
     setStats(getEmptyStats())
+    calculateStats(filteredCards)
   }, [])
+  React.useEffect(()=> {
+    calculateStats(filteredCards)
+  }, [data])
+  
+
 
   return (
     <div>
