@@ -32,8 +32,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import * as Icons from '@mui/icons-material';
-import {getSortedData} from "../utils/sort_data"
-import {getFilteredCards} from "../utils/filter_cards"
+import { MULTI_STAT_CARDS } from '../utils/constants/multi_stat_cards';
+import { getSortedData } from "../utils/sort_data"
+import { getFilteredCards } from "../utils/filter_cards"
 //#region drawer functions
 const drawerWidth = 240;
 
@@ -89,8 +90,8 @@ const isNumeric = (val) => {
 
 export default function Home() {
   let debounce = false
-  let multiStatCards = {Neuroplasticity: true,}
   const [filters, setFilters] = React.useState([])
+  const [filterStats, setFilterStats] = React.useState(false)
   const [filteredCards, setFilteredCards] = React.useState([])
   const [data, setData] = React.useState(getSortedData())
   const [stats, setStats] = React.useState({})
@@ -123,8 +124,11 @@ export default function Home() {
     newStats.RemainingPoints = 327
     return newStats
   }
-  const renderCards = (data,newfilters,newSearch) => {
+  const renderCards = (newData,newfilters,newSearch,newfilterStats,newStats) => {
+    let currentData = newData == null ? data : newData
     let searchInfo = newSearch == null ? search : newSearch
+    let currentFilterStats = newfilterStats == null ? filterStats : newfilterStats
+    let currentStats = newStats == null ? stats : newStats
     let sortFilter = newfilters || filters
     if (newfilters == null) {
       if (debounce) {
@@ -132,7 +136,7 @@ export default function Home() {
       }
       debounce = true
     }
-    let filteredCards = getFilteredCards(data,sortFilter,searchInfo)
+    let filteredCards = getFilteredCards(currentData,sortFilter,searchInfo,currentFilterStats,currentStats)
     setFilteredCards(filteredCards)
   }
   const clickedOnCard = (e,card,index) => {
@@ -172,7 +176,8 @@ export default function Home() {
       }
     })
     setFilteredCards(newfilteredCards)
-    calculateStats(newfilteredCards)
+    let newStats = calculateStats(newfilteredCards)
+    renderCards(data,filters,search,filterStats,newStats)
   }
   const getCardColor = (card) => {
     if (card.Selected) {
@@ -189,12 +194,18 @@ export default function Home() {
     }
     return 'white'
   }
+  const getFilterStatsColor = () => {
+    if (filterStats) {
+      return 'LightBlue'
+    }
+    return 'white'
+  }
   const calculateStats = (selectedCards) => {
     let newStats = getEmptyStats()
     //First do the normal card stuff, ignore neuro i guess
     data.cards.map((card) => {
       if (card.Selected) {
-        if (!multiStatCards[card.name]) {
+        if (!MULTI_STAT_CARDS[card.name]) {
           const addStat = (statName) => {
             if (card.stats[statName] && newStats[statName] < card.stats[statName]) {
               newStats[statName] = card.stats[statName]
@@ -208,7 +219,7 @@ export default function Home() {
     })
     data.cards.map((card) => {
       if (card.Selected) {
-        if (multiStatCards[card.name]) {
+        if (MULTI_STAT_CARDS[card.name]) {
           let usingStats = []
           let cardStats = {...card.stats}
           let foundStat = null
@@ -279,6 +290,7 @@ export default function Home() {
     element_names.map(calculateRemainder)
     weapon_names.map(calculateRemainder)
     setStats(newStats)
+    return newStats
   }
   const clickedOnFilter = (e,label) => {
     if (data.cards.length > 0) { //can only activate filters when there are cards
@@ -312,6 +324,11 @@ export default function Home() {
     let newData = data
     newData.cards = newDataCards
     setData(newData)
+  }
+  const showAvailableCards = (e) => {
+    let newFilterStats = !filterStats
+    setFilterStats(newFilterStats)
+    renderCards(data,filters,search,newFilterStats)
   }
   const getCardStats = (card) => {
     let statsString = ""
@@ -517,6 +534,15 @@ export default function Home() {
               }
               <Divider />
               <List>
+                <ListItemButton onClick={(e) => showAvailableCards(e)}  style={{backgroundColor: getFilterStatsColor()}}>
+                  <ListItemIcon>
+                    <Icons.BookmarkAdd/>
+                  </ListItemIcon>
+                  <ListItemText primary={"Available Cards"} />
+                </ListItemButton>
+              </List>
+              <Divider />
+              <List>
                 {data.elements.map((label, index) => (
                   <ListItem key={label.name} disablePadding>
                     <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
@@ -594,12 +620,14 @@ export default function Home() {
                 ))}
               </List>
               <Divider />
-              <ListItemButton onClick={(e) => clearSelectedCards(e)}  style={{backgroundColor: 'LightCoral'}}>
-                <ListItemIcon>
-                  <Icons.Clear/>
-                </ListItemIcon>
-                <ListItemText primary={"Clear Selected"} />
-              </ListItemButton>
+              <List>
+                <ListItemButton onClick={(e) => clearSelectedCards(e)}  style={{backgroundColor: 'LightCoral'}}>
+                  <ListItemIcon>
+                    <Icons.Clear/>
+                  </ListItemIcon>
+                  <ListItemText primary={"Clear Selected"} />
+                </ListItemButton>
+              </List>
             </>
           }
         </Drawer>

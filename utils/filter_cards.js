@@ -1,12 +1,25 @@
 import { hasWord } from './has_word.js';
+import { MULTI_STAT_CARDS } from './constants/multi_stat_cards';
 
-const getFilteredCards = (data, filters, search) => {
+const getFilteredCards = (data, filters, search, filterStats, stats) => {
   let filteredCards = []
-  const addFilteredCard = (card) => {
+  let attribute_names = []
+  let element_names = []
+  let weapon_names = []
+  data.attributes.map((attribute) => {
+    attribute_names.push(attribute.name)
+  })
+  data.elements.map((element) => {
+    element_names.push(element.name)
+  })
+  data.weapons.map((weapons) => {
+    weapon_names.push(weapons.name)
+  })
+  const addFilteredCard = (card, cardList) => {
     if (hasWord(card.name,search)) {
-      filteredCards.push(card) 
+      cardList.push(card) 
     } else if (hasWord(card.desc,search)) {
-      filteredCards.push(card) 
+      cardList.push(card) 
     }
   }
   if (filters != null && filters.length > 0){
@@ -44,7 +57,7 @@ const getFilteredCards = (data, filters, search) => {
         if (card.idLabels.includes(filterid) || card.idList == filterid) {
           filterCount++
           if (filterCount + listAdjust >= matchingFilters.length && listState < 4){
-            addFilteredCard(card)
+            addFilteredCard(card, filteredCards)
           }
           return
         }
@@ -53,15 +66,46 @@ const getFilteredCards = (data, filters, search) => {
   } else {
     if (typeof search === "string" && search.trim().length > 0) {
       data.cards.map((card) => {
-        addFilteredCard(card)
+        addFilteredCard(card, filteredCards)
       })
     } else {
       data.cards.map((card) => {
         if (card.Selected) {
-          addFilteredCard(card)
+          addFilteredCard(card, filteredCards)
         }
       })
     }
+  }
+  if (filterStats) {
+    let filteredStatsCards = []
+    let cardsList = data.cards
+    if (filters != null && filters.length > 0) {
+      cardsList = filteredCards
+    }
+    cardsList.map((card) => {
+      let addCard = !MULTI_STAT_CARDS[card.name]
+      const addStat = (statName) => {
+        if (MULTI_STAT_CARDS[card.name]) {
+          if (card.stats[statName] && stats[statName] >= card.stats[statName]) {
+            addCard = true
+          }
+        } else {
+          if (card.stats[statName] && stats[statName] < card.stats[statName]) {
+            addCard = false
+          }
+        }
+      }
+      attribute_names.map(addStat)
+      element_names.map(addStat)
+      weapon_names.map(addStat)
+      if (card.CanInput && !(filters != null && filters.length > 0)) {
+        addCard = false
+      }
+      if (addCard) {
+        addFilteredCard(card, filteredStatsCards)
+      }
+    })
+    filteredCards = filteredStatsCards
   }
   return filteredCards
 }
