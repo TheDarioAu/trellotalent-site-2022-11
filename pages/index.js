@@ -506,7 +506,7 @@ export default function Home() {
                   <Typography key={"Hint"} sx={{fontWeight: 500, fontStyle: 'oblique'}} variant="caption">
                     {"Note:"}
                     <br/>
-                    {"-Consider race and starting points"}
+                    {"-Total points: in-game(310), race(4), and starting(13)"}
                     <br/>
                     {"-Remember to account for your weapon"}
                     <br/>
