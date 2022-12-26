@@ -20,6 +20,8 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import NotesIcon from '@mui/icons-material/Notes';
+import TaskIcon from '@mui/icons-material/Task';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -360,6 +362,12 @@ export default function Home() {
     renderCards(data,filters,searchText)
     return
   }
+  const isSelectedCard = (card) => {
+    if (card.Selected && card.name.substring(0, 1) != "#") {
+      return true
+    }
+    return false
+  }
   //#endregion
 
   //#region drawer
@@ -374,11 +382,18 @@ export default function Home() {
     setOpen(false);
   };
 
+  //stats
   const [openCollapse, setOpenCollapse] = React.useState(false);
   const handleCollapse = () => {
     calculateStats(filteredCards)
     setOpenCollapse(!openCollapse);
   };
+  //talents in text
+  const [openCollapse2, setOpenCollapse2] = React.useState(false);
+  const handleCollapse2 = () => {
+    setOpenCollapse2(!openCollapse2);
+  };
+
   //#endregion
 
   //#region prompt
@@ -487,7 +502,7 @@ export default function Home() {
               />
               <ListItemButton onClick={handleCollapse}>
                 <ListItemIcon>
-                  <Icons.AlignVerticalBottom />
+                  <NotesIcon />
                 </ListItemIcon>
                 <ListItemText primary="Stats" />
                 {openCollapse ? <ExpandLess /> : <ExpandMore />}
@@ -535,8 +550,7 @@ export default function Home() {
                     {"-Information may be outdated or incorrect, blame the trello"}
                   </Typography>
                 </List>
-              </Container>
-              }
+              </Container>}
               <Divider />
               <List>
                 <ListItemButton onClick={(e) => showAvailableCards(e)}  style={{backgroundColor: getFilterStatsColor()}}>
@@ -545,6 +559,24 @@ export default function Home() {
                   </ListItemIcon>
                   <ListItemText primary={"Available Cards"} />
                 </ListItemButton>
+                <ListItemButton onClick={handleCollapse2}>
+                  <ListItemIcon>
+                    <TaskIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Talents" />
+                  {openCollapse2 ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                {openCollapse2 && <Container sx={{px: 0, mx:0, width:'100%'}} style={{backgroundColor:'Ivory'}}>
+                  <Divider sx={{my: 1}}/>
+                  <List sx={{ml: 0}} component="div" disablePadding>
+                  {filteredCards.map((card, index) => (
+                    <Typography key={card.name} sx={{fontWeight: 500}}>
+                      {isSelectedCard(card) && card.name}
+                    </Typography>
+                  ))}
+                  </List>
+                  <Divider sx={{my: 1}}/>
+                </Container>}
               </List>
               <Divider />
               <List>
