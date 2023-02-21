@@ -38,15 +38,6 @@ import { MULTI_STAT_CARDS } from '../utils/constants/multi_stat_cards';
 import { getSortedData } from "../utils/sort_data"
 import { getFilteredCards } from "../utils/filter_cards"
 
-
-async function getData() {
-  const response = await fetch('https://deepwoken.co/api/get?type=talent&name=all');
-  const data = await response.json();
-  console.log(data)
-}
-
-getData()
-
 //#region drawer functions
 const drawerWidth = 240;
 
