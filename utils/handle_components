@@ -1,0 +1,35 @@
+const theme = useTheme();
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const handleDrawerOpen = () => {
+    setOpenDrawer(true);
+  };
+  const handleDrawerClose = () => {
+    setOpenDrawer(false);
+  };
+  //stats
+  const [openCollapse, setOpenCollapse] = React.useState(false);
+  const handleCollapse = () => {
+    //calculateStats(filteredCards)
+    setOpenCollapse(!openCollapse);
+  };
+  //talents in text
+  const [openCollapse2, setOpenCollapse2] = React.useState(false);
+  const handleCollapse2 = () => {
+    setOpenCollapse2(!openCollapse2);
+  };
+  const [openPrompt, setOpenPrompt] = React.useState(false)
+  const [promptText, setPromptText] = React.useState("")
+  const [promptInput, setPromptInput] = React.useState(0)
+  const [promptCard, setPromptCard] = React.useState("")
+  const handleClickOpen = (statName, cardName) => {
+    setPromptText(statName)
+    setPromptCard(cardName)
+    setOpenPrompt(true)
+  }
+  const handleClose = () => {
+    setOpenPrompt(false)
+    setCardData(promptCard, promptInput)
+  }
+  const handleInput = (inputValue) => {
+    setPromptInput(inputValue)
+  }
