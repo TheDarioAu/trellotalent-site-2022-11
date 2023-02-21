@@ -12,6 +12,9 @@ app.get('/api/get', async (req, res) => {
   res.json(data);
 });
 
-app.listen(3001, () => {
-  console.log('Express server is running on port 3001');
+const port = process.env.PORT || 3001;
+app.listen(port, () => {
+  console.log(`Express server is running on port ${port}`);
 });
+
+module.exports = app;
