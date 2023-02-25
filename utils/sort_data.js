@@ -1,4 +1,4 @@
-import { getTrelloData } from './api/trello_data.js'
+import { getAllData } from "./api/data.js"
 import { hasWord } from './has_word.js';
 import * as Icons from '@mui/icons-material';
 
@@ -111,102 +111,100 @@ const getSortedData = (setData,renderCards) => {
   sortedData.misc = []
   sortedData.attributes = []
   sortedData.stats = []
-  getTrelloData().then(function(data){
-    data.labels.map((label) => { //sort a-z
-      if (elementlist[label.name]) { // its a element
-        label.icon = elementlist[label.name]
-        sortedData.elements.push(label)
-      } else if (attributelist[label.name]) { // its an attribute
-        label.icon = attributelist[label.name]
-        sortedData.attributes.push(label)
-      } else if (raritylist[label.name]) { // its rarity
-        label.icon = raritylist[label.name]
-        sortedData.rarity.push(label)  
-      } else if (weaponlist[label.name]) { // its weapon
-        label.icon = weaponlist[label.name]
-        sortedData.weapons.push(label) 
-      } else if (label.name.substring(0,1) == "+") { //its a stat
-        sortedData.stats.push(label)
-      } else { //its something else
-        sortedData.misc.push(label)
+  let data = getAllData()
+  data.labels.map((label) => { //sort a-z
+    if (elementlist[label.name]) { // its a element
+      label.icon = elementlist[label.name]
+      sortedData.elements.push(label)
+    } else if (attributelist[label.name]) { // its an attribute
+      label.icon = attributelist[label.name]
+      sortedData.attributes.push(label)
+    } else if (raritylist[label.name]) { // its rarity
+      label.icon = raritylist[label.name]
+      sortedData.rarity.push(label)  
+    } else if (weaponlist[label.name]) { // its weapon
+      label.icon = weaponlist[label.name]
+      sortedData.weapons.push(label) 
+    } else if (label.name.substring(0,1) == "+") { //its a stat
+      sortedData.stats.push(label)
+    } else { //its something else
+      sortedData.misc.push(label)
+    }
+    sortedData.labels.push(label)
+  })
+  data.cards.map((card) => {
+    if (hasWord(card.desc,"talent") && notBlacklisted(card.name)) {
+      card.Selected = false
+      card.CanInput = false
+      card.stats = getStats(card.desc)
+      card.name = cleanName(card.name)
+      card.desc = cleanDesc(card.desc)
+      if (card.name.length > 0) {
+        sortedData.cards.push(card)
       }
-      sortedData.labels.push(label)
-    })
-    data.cards.map((card) => {
-      if (hasWord(card.desc,"talent") && notBlacklisted(card.name)) {
-        card.Selected = false
-        card.CanInput = false
-        card.stats = getStats(card.desc)
-        card.name = cleanName(card.name)
-        card.desc = cleanDesc(card.desc)
-        if (card.name.length > 0) {
-          sortedData.cards.push(card)
-        }
-        data.labels.map((label) => { //add labels to the stats it changes
-          if (card.stats[label.name]) {
-            let foundLabel = false
-            for (let index = 0; index < card.idLabels.length; index++) {
-              if (label.id == card.idLabels[index]) {
-                foundLabel = true
-                break
-              }
-            }
-            if (!foundLabel) {
-              card.idLabels.push(label.id)
+      data.labels.map((label) => { //add labels to the stats it changes
+        if (card.stats[label.name]) {
+          let foundLabel = false
+          for (let index = 0; index < card.idLabels.length; index++) {
+            if (label.id == card.idLabels[index]) {
+              foundLabel = true
+              break
             }
           }
-        })
-      }
-    })
-    const addInputCard = (stat) => {
-      let card = {}
-      card.stats = {[stat]: 0}
-      card.name = `# to ${stat}`
-      card.desc = `Adds an amount to ${stat}.`
-      card.Selected = false
-      card.CanInput = true
-      card.idLabels = []
-      data.labels.map((label) => {
-        if (label.name == stat) {
-          card.idLabels.push(label.id)
+          if (!foundLabel) {
+            card.idLabels.push(label.id)
+          }
         }
       })
-      data.cards.push(card)
-      sortedData.cards.push(card)
-    }
-    weaponCards.map((weaponName) => {
-      addInputCard(`${weaponName} Weapon`)
-    })
-    Object.keys(elementlist).forEach(addInputCard)
-    Object.keys(attributelist).forEach(addInputCard)
-    const sort = (a, b) => {
-      if (a.name < b.name) {
-        return -1
-      }
-      if (a.name > b.name) {
-        return 1
-      }
-      return 0
-    }
-    sortedData.cards.sort(sort)
-    sortedData.labels.sort(sort)
-    sortedData.cardlists = []
-    data.lists.map((list) => {
-      validlists.map((listname) => {
-        if (hasWord(list.name,listname)) {
-          sortedData.cardlists.push(list)
-        }
-      })
-    })
-    if (sortedData.cards.length > 0 && sortedData.labels.length > 0 ) {
-      if (setData) {
-        sortedData.Loaded = true
-        setData(sortedData)
-        renderCards(sortedData)
-      }
-      return
     }
   })
+  const addInputCard = (stat) => {
+    let card = {}
+    card.stats = {[stat]: 0}
+    card.name = `# to ${stat}`
+    card.desc = `Adds an amount to ${stat}.`
+    card.Selected = false
+    card.CanInput = true
+    card.idLabels = []
+    data.labels.map((label) => {
+      if (label.name == stat) {
+        card.idLabels.push(label.id)
+      }
+    })
+    data.cards.push(card)
+    sortedData.cards.push(card)
+  }
+  weaponCards.map((weaponName) => {
+    addInputCard(`${weaponName} Weapon`)
+  })
+  Object.keys(elementlist).forEach(addInputCard)
+  Object.keys(attributelist).forEach(addInputCard)
+  const sort = (a, b) => {
+    if (a.name < b.name) {
+      return -1
+    }
+    if (a.name > b.name) {
+      return 1
+    }
+    return 0
+  }
+  sortedData.cards.sort(sort)
+  sortedData.labels.sort(sort)
+  sortedData.cardlists = []
+  data.lists.map((list) => {
+    validlists.map((listname) => {
+      if (hasWord(list.name,listname)) {
+        sortedData.cardlists.push(list)
+      }
+    })
+  })
+  if (sortedData.cards.length > 0 && sortedData.labels.length > 0 ) {
+    if (setData) {
+      sortedData.Loaded = true
+      setData(sortedData)
+      renderCards(sortedData)
+    }
+  }
   return sortedData
 }
 
