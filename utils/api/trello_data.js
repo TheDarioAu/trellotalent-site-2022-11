@@ -1,5 +1,5 @@
 const getTrelloData = () => {
-    return fetch('./TrelloData.json').then((response)=> {
+    return fetch('https://deepwokenstatmaker.vercel.app/data.json').then((response)=> {
         return response.json()
     }).then((data)=> {
         return Promise.resolve(data)
