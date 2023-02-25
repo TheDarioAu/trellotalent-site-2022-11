@@ -1,28 +1,29 @@
 import * as Icons from '@mui/icons-material';
 export const CATEGORIES = {
-    elements: {
-        Flamecharm: Icons.LocalFireDepartment,
-        Frostdraw: Icons.AcUnit,
-        Galebreath: Icons.Air,
-        Thundercall: Icons.ElectricBolt,
-        Shadowcast: Icons.Nightlight,
-    },
-    attributes: {
-        Strength: Icons.FitnessCenter,
-        Agility: Icons.DirectionsRun,
-        Intelligence: Icons.EmojiObjects,
-        Fortitude: Icons.HealthAndSafety,
-        Charisma: Icons.AddReaction,
-        Willpower: Icons.Psychology,
-    },
-    weapons: {
-        Light: Icons.BarChart,
-        Medium: Icons.BarChart,
-        Heavy: Icons.BarChart,
-    },
-    rarity: {
-        Common: Icons.StarOutlineOutlined,
-        Rare: Icons.StarRate,
-        Advanced: Icons.AutoAwesome,
-    },
+    elements: [
+        {Name: "Flamecharm", Icon: Icons.LocalFireDepartment},
+        {Name: "Frostdraw", Icon: Icons.AcUnit},
+        {Name: "Galebreathe", Icon: Icons.Air},
+        {Name: "Thundercall", Icon: Icons.ElectricBolt},
+        {Name: "Shadowcast", Icon: Icons.Nightlight},
+    ],
+    attributes: [
+        {Name: "Strength", Icon: Icons.FitnessCenter},
+        {Name: "Agility", Icon: Icons.DirectionsRun},
+        {Name: "Intelligence", Icon: Icons.EmojiObjects},
+        {Name: "Fortitude", Icon: Icons.HealthAndSafety},
+        {Name: "Charisma", Icon: Icons.AddReaction},
+        {Name: "Willpower", Icon: Icons.Psychology},
+    ],
+    weapons: [
+        {Name: "Light", Icon: Icons.BarChart},
+        {Name: "Medium", Icon: Icons.BarChart},
+        {Name: "Heavy", Icon: Icons.BarChart},
+    ],
+    rarity: [
+        {Name: "Oath", Icon: Icons.StarOutlineOutlined},
+        {Name: "Common", Icon: Icons.StarOutlineOutlined},
+        {Name: "Rare", Icon: Icons.StarRate},
+        {Name: "Advanced", Icon: Icons.AutoAwesome},
+    ],
 }

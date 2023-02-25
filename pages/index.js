@@ -33,7 +33,8 @@ import { getEmptyStats } from "../utils/empty_stats"
 import { getSortedData } from "../utils/sort_data"
 import { getFilteredCards } from "../utils/filtered_cards"
 import { loadingMessage } from "../utils/loading_message"
-
+import { getFilterStatsColor, getCardColor, getLabelColor  } from "../utils/component_colors"
+import { clickedOnCard, getCardStats, clickedOnFilter } from "../utils/card_functions"
 //#region drawer functions
 const drawerWidth = 240;
 
@@ -98,16 +99,21 @@ export default function Home() {
   const handleCollapse = () => {
     setOpenCollapse(!openCollapse);
   };
+  const [openCollapse2, setOpenCollapse2] = React.useState(false);
+  const handleCollapse2 = () => {
+    setOpenCollapse2(!openCollapse2);
+  };
   //#endregion
 
-  const [data, setData] = React.useState({Loaded: false, cards: []})
+  const [data, setData] = React.useState(getSortedData())
   const [filters, setfilters] = React.useState([])
+  const [search, setSearch] = React.useState("")
   const renderData = (newData) => {
     setData(newData)
   }
-  
+
   React.useEffect(()=> {
-    renderData(getSortedData())
+    getSortedData(setData)
   }, [])
   React.useEffect(()=> {
     renderData(data)
@@ -115,6 +121,8 @@ export default function Home() {
   React.useEffect(()=> {
     setfilters(filters)
   }, [filters])
+
+  
 
   return (
     <div>
@@ -179,27 +187,27 @@ export default function Home() {
               {openCollapse && <Container sx={{px: 0, mx:0, width:'100%'}} style={{backgroundColor:'Ivory'}}>
                 <Divider sx={{my: 1}}/>
                 <List sx={{ml: 0}} component="div" disablePadding>
-                {attribute_names.map((statName, index) => (
-                  <Typography key={statName} sx={{fontWeight: 500}}>
-                    {statName + ": " + stats[statName]}
+                {CATEGORIES.attributes.forEach(item => {
+                  <Typography key={item.Name} sx={{fontWeight: 500}}>
+                    {item.Name + ": " + stats[item.Name]}
                   </Typography>
-                ))}
+                })}
                 </List>
                 <Divider sx={{my: 1}}/>
                 <List sx={{ml: 0}} component="div" disablePadding>
-                {element_names.map((statName, index) => (
-                  <Typography key={statName} sx={{fontWeight: 500}}>
-                    {statName + ": " + stats[statName]}
+                {CATEGORIES.elements.forEach(item => {
+                  <Typography key={item.Name} sx={{fontWeight: 500}}>
+                    {item.Name + ": " + stats[item.Name]}
                   </Typography>
-                ))}
+                })}
                 </List>
                 <Divider sx={{my: 1}}/>
                 <List sx={{ml: 0}} component="div" disablePadding>
-                {weapon_names.map((statName, index) => (
-                  <Typography key={statName} sx={{fontWeight: 500}}>
-                    {statName + ": " + stats[statName]}
+                {CATEGORIES.weapons.forEach(item => {
+                  <Typography key={item.Name} sx={{fontWeight: 500}}>
+                    {item.Name + ": " + stats[item.Name]}
                   </Typography>
-                ))}
+                })}
                 </List>
                 <Divider sx={{my: 1}}/>
                 <List sx={{ml: 0}} component="div" disablePadding>
@@ -233,12 +241,12 @@ export default function Home() {
                     <Icons.Task />
                   </ListItemIcon>
                   <ListItemText primary="Talents" />
-                  {openCollapse2 ? <ExpandLess /> : <ExpandMore />}
+                  {openCollapse2 ? <Icons.ExpandLess /> : <Icons.ExpandMore />}
                 </ListItemButton>
                 {openCollapse2 && <Container sx={{px: 0, mx:0, width:'100%'}} style={{backgroundColor:'Ivory'}}>
                   <Divider sx={{my: 1}}/>
                   <List sx={{ml: 0}} component="div" disablePadding>
-                  {getFilteredCards(data.cards, filters).map((card, index) => (
+                  {getFilteredCards(data, filters, search).map((card, index) => (
                     <Typography key={card.name} sx={{fontWeight: 500}}>
                       {isSelectedCard(card) && card.name}
                     </Typography>
@@ -249,78 +257,52 @@ export default function Home() {
               </List>
               <Divider />
               <List>
-                {data.elements.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
+                {CATEGORIES.elements.map(item => (
+                  <ListItem key={item.Name} disablePadding>
+                    <ListItemButton onClick={(e) => clickedOnFilter(e,data.cards,item,filters,setfilters)} style={{backgroundColor: getLabelColor(item)}}>
                       <ListItemIcon>
-                        <label.icon/>
+                        <item.Icon/>
                       </ListItemIcon>
-                      <ListItemText primary={label.name} />
+                      <ListItemText primary={item.Name} />
                     </ListItemButton>
                   </ListItem>
                 ))}
               </List>
               <Divider />
               <List>
-                {data.attributes.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
+                {CATEGORIES.attributes.map(item => (
+                  <ListItem key={item.Name} disablePadding>
+                    <ListItemButton onClick={(e) => clickedOnFilter(e,data.cards,item,filters,setfilters)} style={{backgroundColor: getLabelColor(item)}}>
                       <ListItemIcon>
-                        <label.icon/>
+                        <item.Icon/>
                       </ListItemIcon>
-                      <ListItemText primary={label.name} />
+                      <ListItemText primary={item.Name} />
                     </ListItemButton>
                   </ListItem>
                 ))}
               </List>
               <Divider />
               <List>
-                {data.rarity.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
+                {CATEGORIES.rarity.map(item => (
+                  <ListItem key={item.Name} disablePadding>
+                    <ListItemButton onClick={(e) => clickedOnFilter(e,data.cards,item,filters,setfilters)} style={{backgroundColor: getLabelColor(item)}}>
                       <ListItemIcon>
-                        <label.icon/>
+                        <item.Icon/>
                       </ListItemIcon>
-                      <ListItemText primary={label.name} />
+                      <ListItemText primary={item.Name} />
                     </ListItemButton>
                   </ListItem>
                 ))}
               </List>
               <Divider />
               <List>
-                {data.weapons.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
+                {CATEGORIES.weapons.map(item => (
+                  <ListItem key={item.Name} disablePadding>
+                    <ListItemButton onClick={(e) => clickedOnFilter(e,data.cards,item,filters,setfilters)} style={{backgroundColor: getLabelColor(item)}}>
                       <ListItemIcon>
-                        <label.icon/>
+                        <item.Icon/>
                       </ListItemIcon>
-                      <ListItemText primary={label.name} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-              <Divider />
-              <List>
-                {data.misc.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
-                      <ListItemIcon>
-                        <Icons.AlignVerticalBottom />
-                      </ListItemIcon>
-                      <ListItemText primary={label.name} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-              <Divider />
-              <List>
-                {data.stats.map((label, index) => (
-                  <ListItem key={label.name} disablePadding>
-                    <ListItemButton onClick={(e) => clickedOnFilter(e, label)} style={{backgroundColor: getLabelColor(label)}}>
-                      <ListItemIcon>
-                        <Icons.Add/>
-                      </ListItemIcon>
-                      <ListItemText primary={label.name} />
+                      <ListItemText primary={item.Name} />
                     </ListItemButton>
                   </ListItem>
                 ))}
@@ -366,8 +348,8 @@ export default function Home() {
                     pb: 6,
                   }}
                 >
-                {data.cards.map((card, index) => {
-                  return <Button key={index} onClick={(e) => clickedOnCard(e, card, index)} sx={{width: '20%'}} color="warning">
+                {getFilteredCards(data, filters, search).map((card, index) => (
+                  <Button key={index} onClick={(e) => clickedOnCard(e, card.name, data, setData)} sx={{width: '20%'}} color="warning">
                     <Card sx={{width: '100%', height: '100%'}} style={{backgroundColor: getCardColor(card)}}>
                       <CardContent>
                         <Typography sx={{textTransform: 'none'}} variant="h6" component="div">
@@ -378,20 +360,21 @@ export default function Home() {
                             <br/>
                             {card.desc}
                             <br/>
-                            <br/>
-                            {getCardStats(card)}
+                            {getCardStats(card).map((stat) => (
+                              {stat}
+                            ))}
                           </Typography>
                         }
                       </CardContent>
                     </Card>
                   </Button> 
-                })}
-                {!loadingMessage(data) && getFilteredCards(data.cards, filters).length <= 0 && filters.length <= 0 && 
+                ))}
+                {!loadingMessage(data) && getFilteredCards(data, filters, search).length <= 0 && filters.length <= 0 && 
                   <Typography sx={{textTransform: 'none', mx:'auto', fontWeight: 'bold' , fontSize: 'h3.fontSize', fontStyle: 'oblique', pt: 5}} color="success.main" variant="0" component="div">
                     {"Choose a Category from the Sidebar"}
                   </Typography>
                 }
-                {getFilteredCards(data.cards, filters).length <= 0 && filters.length > 0 && 
+                {getFilteredCards(data, filters, search).length <= 0 && filters.length > 0 && 
                   <Typography sx={{textTransform: 'none', mx:'auto', fontWeight: 'bold' , fontSize: 'h3.fontSize', fontStyle: 'oblique', pt: 5}} color="error.main" variant="0" component="div">
                     {"Found Nothing from the Categories Chosen"}
                   </Typography>
